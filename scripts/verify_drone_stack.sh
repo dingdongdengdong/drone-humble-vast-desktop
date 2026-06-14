@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 echo "=== OS ==="
 cat /etc/os-release | sed -n '1,6p'
@@ -12,6 +12,7 @@ else
 fi
 
 echo "=== ROS2 ==="
+# ROS setup files reference optional variables, so do not use bash nounset while sourcing them.
 source /opt/ros/humble/setup.bash
 ros2 --version || true
 echo "ROS_DISTRO=${ROS_DISTRO:-unset}"
