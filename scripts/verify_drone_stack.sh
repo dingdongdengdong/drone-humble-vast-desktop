@@ -20,7 +20,12 @@ echo "RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-unset}"
 echo "CYCLONEDDS_URI=${CYCLONEDDS_URI:-unset}"
 
 echo "=== PX4 / DDS tools ==="
-command -v MicroXRCEAgent && MicroXRCEAgent --help | head -20 || echo "MicroXRCEAgent missing"
+if command -v MicroXRCEAgent >/dev/null 2>&1; then
+  echo "MicroXRCEAgent installed: $(command -v MicroXRCEAgent)"
+  MicroXRCEAgent --help 2>&1 | sed -n '1,20p' || true
+else
+  echo "MicroXRCEAgent missing"
+fi
 ros2 pkg prefix mavros >/dev/null 2>&1 && echo "mavros installed" || echo "mavros missing"
 ros2 pkg prefix foxglove_bridge >/dev/null 2>&1 && echo "foxglove_bridge installed" || echo "foxglove_bridge missing"
 ros2 pkg prefix rosbridge_server >/dev/null 2>&1 && echo "rosbridge_server installed" || echo "rosbridge_server missing"
