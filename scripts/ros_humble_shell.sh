@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
+# ROS setup files reference optional variables, so do not use bash nounset while sourcing them.
 source /opt/ros/humble/setup.bash
 export ROS_WS="${ROS_WS:-/workspaces/ros2_ws}"
 export PEGASUS_WS="${PEGASUS_WS:-/workspaces/pegasus_ws}"
