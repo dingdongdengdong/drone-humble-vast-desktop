@@ -4,6 +4,14 @@ Vast.ai GPU desktop container for a drone inspection project using ROS2 Humble, 
 
 This repo intentionally does **not** use Isaac ROS.
 
+## Maintainer setup guide
+
+For Isaac Sim 5.1, Pegasus, VNC/noVNC display notes, root launch handling, DDS, and troubleshooting, see:
+
+```text
+docs/ISAAC_SIM_PEGASUS_VNC_SETUP.md
+```
+
 ## Target stack
 
 - Ubuntu 22.04 / ROS2 Humble
