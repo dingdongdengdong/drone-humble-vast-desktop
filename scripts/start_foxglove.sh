@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 source /opt/ros/humble/setup.bash
 export ROS_WS="${ROS_WS:-/workspaces/ros2_ws}"
