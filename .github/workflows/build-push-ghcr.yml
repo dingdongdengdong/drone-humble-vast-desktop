@@ -1,0 +1,67 @@
+name: Build and push Docker image to GHCR
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      base_image:
+        description: "Ubuntu 22.04 Vast base image tag"
+        required: true
+        default: "vastai/base-image:cuda-12.8.1-cudnn-devel-ubuntu22.04"
+      image_name:
+        description: "Image name"
+        required: true
+        default: "drone-humble-vast-desktop"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set build variables
+        id: vars
+        shell: bash
+        run: |
+          BASE_IMAGE="${{ github.event.inputs.base_image }}"
+          IMAGE_NAME="${{ github.event.inputs.image_name }}"
+          if [ -z "$BASE_IMAGE" ]; then BASE_IMAGE="vastai/base-image:cuda-12.8.1-cudnn-devel-ubuntu22.04"; fi
+          if [ -z "$IMAGE_NAME" ]; then IMAGE_NAME="drone-humble-vast-desktop"; fi
+          echo "base_image=$BASE_IMAGE" >> "$GITHUB_OUTPUT"
+          echo "image_name=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
+          echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push with plain logs
+        shell: bash
+        run: |
+          set -o pipefail
+          docker buildx build \
+            --progress=plain \
+            --push \
+            --build-arg BASE_IMAGE=${{ steps.vars.outputs.base_image }} \
+            -t ghcr.io/${{ steps.vars.outputs.owner_lc }}/${{ steps.vars.outputs.image_name }}:ubuntu22 \
+            . 2>&1 | tee docker-build.log
+
+      - name: Upload Docker build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-log
+          path: docker-build.log
+          if-no-files-found: ignore
